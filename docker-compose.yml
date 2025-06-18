@@ -28,7 +28,7 @@ services:
     environment:
       - ENVIRONMENT=${ENVIRONMENT:-production}
       - API_KEY=${API_KEY:-}
-      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002,http://127.0.0.1:3002}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002,http://127.0.0.1:3002,https://fake-twitter.jackskehan.tech}
     volumes:
       - ./twitterapi/data:/app/data:ro
     healthcheck:
@@ -46,7 +46,7 @@ services:
       - "3002:3000"
     restart: unless-stopped
     environment:
-      - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:8000}
+      - REACT_APP_API_URL=${REACT_APP_API_URL:-https://fake-twitter.jackskehan.tech}
       - REACT_APP_API_KEY=${REACT_APP_API_KEY:-}
     depends_on:
       twitter-api:
