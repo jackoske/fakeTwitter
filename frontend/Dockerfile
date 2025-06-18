@@ -4,26 +4,14 @@ FROM node:18-alpine AS build
 # Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy everything
+COPY . .
 
-# Install ALL dependencies (including dev dependencies needed for build)
+# Install dependencies
 RUN npm ci
-
-# Copy source code - be more explicit about what we're copying
-COPY public/ ./public/
-COPY src/ ./src/
-COPY tsconfig.json ./
-COPY package.json ./
-
-# Debug: List what's in the public directory
-RUN ls -la public/
 
 # Build the application
 RUN npm run build
-
-# Debug: List what's in the build directory
-RUN ls -la build/
 
 # Production stage
 FROM nginx:alpine
@@ -31,7 +19,7 @@ FROM nginx:alpine
 # Install curl for health checks
 RUN apk add --no-cache curl
 
-# Copy built application from the correct path
+# Copy built application
 COPY --from=build /app/build /usr/share/nginx/html
 
 # Copy nginx configuration
