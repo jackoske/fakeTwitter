@@ -1,0 +1,59 @@
+services:
+  shooteminthedark:
+    build:
+      context: ./ShootEmInTheDark
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+
+  lgs:
+    build:
+      context: ./LGS
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=production
+
+  # Twitter API Service
+  twitter-api:
+    build:
+      context: ./twitterapi
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - API_KEY=${API_KEY:-}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3002,http://127.0.0.1:3002}
+    volumes:
+      - ./twitterapi/data:/app/data:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Twitter Frontend Service
+  twitter-frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3002:3000"
+    restart: unless-stopped
+    environment:
+      - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:8000}
+      - REACT_APP_API_KEY=${REACT_APP_API_KEY:-}
+    depends_on:
+      twitter-api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s 
