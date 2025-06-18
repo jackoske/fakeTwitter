@@ -4,6 +4,12 @@ import { TweetResponse, TweetsListResponse } from './types';
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 const API_KEY = process.env.REACT_APP_API_KEY;
 
+// Debug logging (remove in production)
+console.log('API Configuration:', {
+  API_BASE_URL,
+  API_KEY: API_KEY ? '***SET***' : 'NOT SET'
+});
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {

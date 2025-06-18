@@ -4,11 +4,21 @@ FROM node:18-alpine AS build
 # Set working directory
 WORKDIR /app
 
-# Copy everything
-COPY . .
+# Copy package files first for better caching
+COPY package*.json ./
 
 # Install dependencies
 RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Build the application with environment variables
+# These will be passed from docker-compose
+ARG REACT_APP_API_URL
+ARG REACT_APP_API_KEY
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+ENV REACT_APP_API_KEY=$REACT_APP_API_KEY
 
 # Build the application
 RUN npm run build
